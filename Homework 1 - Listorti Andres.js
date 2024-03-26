@@ -86,5 +86,5 @@ console.log("8".divide("2")); // Output: 4
 console.log("5".multiply("4")); // Output: 20
 console.log("10".divide("3")); // Output: 3
 
-// Will throw an error
+// Example error
 // console.log("1".minus("2")); // Output: Error
