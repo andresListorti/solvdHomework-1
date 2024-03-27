@@ -12,6 +12,8 @@
 // •	For subtraction, ensure that the first parameter is always greater than the second parameter.
 // •	Division should only result in an integer value.
 
+
+// Plus
 String.prototype.plus = function (anotherString) {
   let result = "";
   let carry = 0;
@@ -29,62 +31,138 @@ String.prototype.plus = function (anotherString) {
   return result;
 };
 
+//Minus
 String.prototype.minus = function (anotherString) {
-
-   if (parseInt(this) < parseInt(anotherString)) {
-    throw new Error("The first parameter must be greater than the second parameter for subtraction.");
-}
-
-    let result = "";
-    let borrow = 0;
-  
-    for (let i = 0; i < this.length; i++) {
-      const digit1 = parseInt(this[this.length - 1 - i]);
-      const digit2 = parseInt(anotherString[anotherString.length - 1 - i] || 0);
-      let difference = digit1 - digit2 - borrow;
-      if (difference < 0) {
-        difference += 10;
-        borrow = 1;
-      } else {
-        borrow = 0;
-      }
-      result = difference + result;
-    }
-  
-    return result.replace(/^0+/, ""); // Remove leading zeros
-  
-
-};
-
-String.prototype.divide = function (anotherString) {
-  let dividend = parseInt(this);
-  const divisor = parseInt(anotherString);
-  let quotient = 0;
-
-  while (dividend >= divisor) {
-    dividend -= divisor;
-    quotient++;
+  if (parseInt(this) < parseInt(anotherString)) {
+    throw new Error(
+      "The first parameter must be greater than the second parameter for subtraction."
+    );
   }
 
-  return quotient.toString();
+  let result = "";
+  let borrow = 0;
+
+  for (let i = 0; i < this.length; i++) {
+    const digit1 = parseInt(this[this.length - 1 - i]);
+    const digit2 = parseInt(anotherString[anotherString.length - 1 - i] || 0);
+    let difference = digit1 - digit2 - borrow;
+    if (difference < 0) {
+      difference += 10;
+      borrow = 1;
+    } else {
+      borrow = 0;
+    }
+    result = difference + result;
+  }
+
+  return result.replace(/^0+/, ""); // Remove leading zeros
 };
 
+// Divide
+String.prototype.divide = function (anotherString) {
+  const dividend = this;
+  const divisor = anotherString;
+
+  if (divisor === "0") {
+    throw new Error("Division by zero.");
+  }
+
+ if (dividend === "0" || dividend === "") {
+    return "0";
+  }
+
+  // Convert strings to BigInt for comparison
+  const bigDividend = BigInt(dividend);
+  const bigDivisor = BigInt(divisor);
+
+  let quotient = "";
+  let remainder = BigInt(0);
+
+  for (let i = 0; i < dividend.length; i++) {
+    remainder = remainder * BigInt(10) + BigInt(dividend[i]);
+    const digit = remainder / bigDivisor;
+    quotient += digit.toString();
+    remainder %= bigDivisor;
+  }
+
+  // Remove leading zeros from quotient
+  quotient = quotient.replace(/^0+/, "");
+
+  return quotient || "0";
+};
+
+
+// Multiply
 String.prototype.multiply = function (anotherString) {
+  // Digit count only for this function
+  function containsBigInt(inputString) {
+    let digitCount = 0;
+    for (let i = 0; i < inputString.length; i++) {
+      digitCount++;
+    }
+    if (digitCount > 10) {
+      // "If the number of digits exceeds the threshold, it returns true."
+      return true;
+    } else {
+      return false;
+    }
+  }
+  if (containsBigInt(anotherString)) {
+    const multiplyByDigit = (num, digit) => {
+      let result = "";
+      let carry = 0;
+
+      // Iterate through each digit of the number from right to left
+      for (let i = num.length - 1; i >= 0; i--) {
+          const currentDigit = parseInt(num[i]);
+          const product = currentDigit * digit + carry;
+          result = (product % 10) + result; // Add the last digit to the result
+          carry = Math.floor(product / 10); // Update carry for the next iteration
+      }
+      
+      // If there is a carry after all iterations, add it to the result
+      if (carry > 0) {
+          result = carry + result;
+      }
+
+      return result;
+  };
+
   let product = "0";
 
-  for (let i = 0; i < parseInt(anotherString); i++) {
-    product = product.plus(this);
+  for (let i = 0; i < anotherString.length; i++) {
+      const digit = parseInt(anotherString[anotherString.length - 1 - i]);
+      const partialProduct = multiplyByDigit(this, digit) + "0".repeat(i);
+      product = product.plus(partialProduct);
   }
 
   return product;
+  } else {
+    let product = "0";
+
+    for (let i = 0; i < parseInt(anotherString); i++) {
+      product = product.plus(this);
+    }
+
+    return product;
+   }
 };
 
 // Examples
 console.log("11".plus("11")); // Output: 22
+console.log("8888888888888888888".plus("2222222222")); // Output: 8888888891111111110
+console.log("999999999999999999999".plus("1")); // Output: 1000000000000000000000
 console.log("4".minus("2")); // Output: 2
 console.log("8".divide("2")); // Output: 4
-console.log("5".multiply("4")); // Output: 20
 console.log("10".divide("3")); // Output: 3
+console.log("13".divide("3")); // Output: 4
+console.log("888888888888888888888888888888".divide("2")); // Output: 4444444444444444444444444444
+console.log("5".multiply("4")); // Output: 20
+console.log("11".multiply("4")); // Output: 44
+console.log("111111111".multiply("4")); // Output: 444444444
+console.log("11111111111111111111111111111111".multiply("4")); // Output: 44444444444444444444444444444444
+console.log("11111111111111111111111111111111".multiply("44444444444")); // Output: 493827160488888888888888888888883950617284
 
-// Example error
-// console.log("1".minus("2")); // Output: Error
+// Example errors
+// console.log("1".minus("2")); // Output: Error - The first parameter must be greater than the second parameter for subtraction.
+// console.log("1".divide("0")); // Output: Error - Division by zero.
