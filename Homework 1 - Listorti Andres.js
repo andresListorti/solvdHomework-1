@@ -117,7 +117,13 @@ String.prototype.multiply = function (anotherString) {
           const currentDigit = parseInt(num[i]);
           const product = currentDigit * digit + carry;
           result = (product % 10) + result; // Add the last digit to the result
-          carry = Math.floor(product / 10); // Update carry for the next iteration
+          if (product >= 10) {   // Update carry for the next iteration
+
+            carry = int(product / 10)
+          } else {
+           carry = 0
+
+          }
       }
       
       // If there is a carry after all iterations, add it to the result
