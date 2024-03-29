@@ -67,22 +67,19 @@ String.prototype.divide = function (anotherString) {
     throw new Error("Division by zero.");
   }
 
- if (dividend === "0" || dividend === "") {
+  if (dividend === "0" || dividend === "") {
     return "0";
   }
 
-  // Convert strings to BigInt for comparison
-  const bigDividend = BigInt(dividend);
-  const bigDivisor = BigInt(divisor);
-
   let quotient = "";
-  let remainder = BigInt(0);
+  let remainder = 0;
 
   for (let i = 0; i < dividend.length; i++) {
-    remainder = remainder * BigInt(10) + BigInt(dividend[i]);
-    const digit = remainder / bigDivisor;
+    remainder = remainder * 10 + parseInt(dividend[i]);
+    const digit = remainder / parseInt(divisor) | 0;
+
     quotient += digit.toString();
-    remainder %= bigDivisor;
+    remainder %= parseInt(divisor);
   }
 
   // Remove leading zeros from quotient
@@ -90,7 +87,6 @@ String.prototype.divide = function (anotherString) {
 
   return quotient || "0";
 };
-
 
 // Multiply
 String.prototype.multiply = function (anotherString) {
